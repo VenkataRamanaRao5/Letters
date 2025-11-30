@@ -16,9 +16,10 @@ class Chainable:
     done = False
 
     """
-    Executes one iteration of updation while inside the loop. Does
-    not return anything, so implement the subclass to perform side
-    effects as needed.
+    Execute one iteration of updation while inside the loop. Returns 
+    anything. The composed Chainable cannot set its attributes. So, the 
+    result must be returned, but intermediate variables can be stored to
+    be accessed across iterations.
 
     Parameters
     ----------
@@ -28,18 +29,20 @@ class Chainable:
 
     Returns
     -------
-    None
+    out : Any
+        the result of the update
     """
-    def update(self, i: Optional[int]) -> None:
+    def update(self, i: Optional[int] = None) -> Any:
         done = True
 
     """
     Return a Chainable instance on which when update is
-    called, conditionally calls self.update first if 
-    self.done is False, otherwise calls other.update
+    called, conditionally return self.update first if 
+    self.done is False, otherwise return other.update
     if other.done is False. If both are True, sets its
-    done as True. This takes in an Chainable and returns 
-    a Chainable, so it can composed infinitely in any order.
+    done as True and return None. This takes in an Chainable 
+    and returns a Chainable, so it can composed infinitely in 
+    any order.
 
     Parameters
     ----------
@@ -54,11 +57,11 @@ class Chainable:
         conditionally calls update on self and other.
     """
     def then(self, other: 'Chainable') -> 'Chainable':
-        def function(this, i: Optional[int]) -> None:
+        def function(this, i: Optional[int] = None) -> Any:
             if not self.done:
-                self.update(i)
+                return self.update(i)
             elif not other.done:
-                other.update(i)
+                return other.update(i)
             else:
                 this.done = True
         
