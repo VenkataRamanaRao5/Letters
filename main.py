@@ -18,7 +18,7 @@ for i in range(20):
     chain.update(i)
 
 import pygame
-from Letters import SemiEllipse, Line, Parabola
+from Letters import SemiEllipse, Line, Parabola, Config, Letter
 
 pygame.init()
 width, height = 1000, 600
@@ -27,25 +27,15 @@ pygame.display.set_caption("Chainable")
 clock=pygame.time.Clock()
 x, y = 0, 0
 
-first = SemiEllipse(200, 200, 30, 30, -1, isTop=True)
-second = SemiEllipse(200, 200, 30, 30, 1, isTop=False)
-third = SemiEllipse(260, 200, 30, 30, 1, isTop=True)
-fourth = SemiEllipse(260, 200, 30, 30, -1, isTop=False)
+config = Config(master_dimension=60, radiusx=30, radiusy=30, height=120)
+letter = Letter(config)
 
-circle = first.then(second).then(third).then(fourth)
+a = letter.a(50, 80)
+b = letter.b(150, 80)
+c = letter.c(240, 80)
+d = letter.d(320, 80)
 
-left = Line(300, 330, 300, 270, 30)
-right = Line(360, 270, 360, 330, 30)
-top = Line(300, 270, 360, 270, 30)
-bottom = Line(360, 330, 300, 330, 30)
-backslash = Line(300, 330, 360, 270, 60)
-
-square = left.then(top).then(right).then(bottom).then(backslash)
-
-openUp = Parabola(200, 260, 360, 60, 200, 1, 60, 0.5)
-openDown = Parabola(200, 260, 360, -30, 260, -1, 30, 1)
-
-chain = circle.then(square).then(openUp).then(openDown)
+chain = a.then(b).then(c).then(d)
 
 try:
     Display.fill('grey')
@@ -58,9 +48,10 @@ try:
 
         coord = chain.update()
         if coord:
+            print(coord)
             pygame.draw.circle(Display, "#732f14", coord, 8)
         pygame.display.flip()
-        clock.tick(60)
+        clock.tick(200)
 
 finally:
     pygame.quit()
