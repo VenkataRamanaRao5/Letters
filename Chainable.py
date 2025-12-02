@@ -1,4 +1,4 @@
-from typing import *
+from typing import Optional, Any
 
 """
 This class is meant to provide functionality to chain updates 
@@ -33,7 +33,7 @@ class Chainable:
         the result of the update
     """
     def update(self, i: Optional[int] = None) -> Any:
-        done = True
+        self.done = True
 
     """
     Return a Chainable instance on which when update is

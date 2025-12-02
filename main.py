@@ -34,8 +34,28 @@ a = letter.a(50, 80)
 b = letter.b(150, 80)
 c = letter.c(240, 80)
 d = letter.d(320, 80)
+h = letter.h(420, 80)
+i = letter.i(500, 100, 5)
+l = letter.l(540, 20)
+m = letter.m(570, 80)
+n = letter.n(690, 80)
+o = letter.o(770, 80)
+p = letter.p(860, 80)
+q = letter.q(50, 230)
+t = letter.t(150, 170)
+u = letter.u(220, 230)
+v = letter.v(310, 230)
+w = letter.w(390, 230)
+x = letter.x(490, 230)
+y = letter.y(570, 230)
+z = letter.z(660, 230)
 
-chain = a.then(b).then(c).then(d)
+chain = Chainable()
+
+chain = a.then(b).then(c).then(d).then(h).then(i)
+chain = chain.then(l).then(m).then(n).then(o).then(p)
+chain = chain.then(q).then(t).then(u).then(v).then(w)
+chain = chain.then(x).then(y).then(z)
 
 try:
     Display.fill('grey')
@@ -51,7 +71,7 @@ try:
             print(coord)
             pygame.draw.circle(Display, "#732f14", coord, 8)
         pygame.display.flip()
-        clock.tick(200)
+        clock.tick(600)
 
 finally:
     pygame.quit()
