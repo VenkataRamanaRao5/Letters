@@ -39,7 +39,7 @@ while not done:
     # rendering
 ```
 
-As simple as that. If not, it calls its update method. If yes, it sets `self.done` to `True`. In this case, we first call the first line's update method until it's done; then we call second's line's update and so on. This chaining is accomplished by the `then` method. Inside `then`, we build and return a new `Chainable` instance `result`. We first define a function with `self` and `other` as arguments. It first checks first line has set `done` to `True`. If not, it calls its update method. If yes, it checks if other has set `done` to `True`. We attach this function as bounded method to result.update and we return result as the new instance.
+As simple as that. In this case, we first call the first line's update method until it's done; then we call second's line's update and so on. This chaining is accomplished by the `then` method. Inside `then`, we build and return a new `Chainable` instance `result`. We first define a function with `self` and `other` as arguments. It first checks first line has set `done` to `True`. If not, it calls its update method. If yes, it checks if other has set `done` to `True`. If not, it calls its update method. If yes, it sets `self.done` to `True`.  We attach this function as bounded method to result.update and we return result as the new instance.
 
 ## How is this useful? 
 1. We can define primitive strokes and reuse them extremely easily in letters like below
@@ -78,4 +78,4 @@ while not done:
 
 Here's a demo video of all the letters implemented so far in a single chain. This is recording of the pygame window of `main.py`
 
-[demo.mp4](output2.mp4)
+https://github.com/user-attachments/assets/68e7e297-0d9d-4f96-b21b-c1f687329652
