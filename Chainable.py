@@ -1,4 +1,4 @@
-from typing import Optional, Any
+from typing import List, Optional, Any
 
 """
 This class is meant to provide functionality to chain updates 
@@ -69,4 +69,7 @@ class Chainable:
         chainedChain.update = function.__get__(chainedChain)
         return chainedChain
 
-        
+    def chain(self, others: List['Chainable']) -> 'Chainable':
+        if len(others) == 0:
+            return self
+        return self.then(others[0]).chain(others[1:])

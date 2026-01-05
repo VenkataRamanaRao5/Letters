@@ -1,5 +1,6 @@
 from Chainable import Chainable
 from typing import Optional
+from Helpers import SemiEllipse, Parabola, Line
 
 class Config:
     def __init__(self, 
@@ -11,83 +12,6 @@ class Config:
         self.radiusx = radiusx or self.master_dimension / 2
         self.radiusy = radiusy or self.master_dimension / 2
         self.height = height or self.master_dimension * 2
-
-class SemiEllipse(Chainable):
-    def __init__(self, centerx, centery, radiusx, radiusy, dx = 1, isTop = True, starti = 0, stepi = 1, endi = None):
-        super().__init__()
-        if dx not in [1, -1]:
-            raise ValueError("parameter dx of SemiEllipse object must be eiterh +1 or -1")
-        self.centerx = centerx
-        self.centery = centery
-        self.radiusx = radiusx
-        self.radiusy = radiusy
-        self.dx = dx * stepi
-        self.isTop = isTop
-        self.starti = starti
-        self.endi = endi or 2 * self.radiusx
-        self.stepi = stepi
-        self.dy = -1 if isTop else 1
-
-        self.x = self.centerx - dx * (radiusx + dx * (2 * starti / self.endi) * radiusx) - self.dx
-        self.i = starti
-
-    def update(self, i = None):
-        if not self.done:
-            self.x += self.dx
-            self.y = self.dy * self.radiusy * (1 - ((self.x - self.centerx) / self.radiusx) ** 2) ** 0.5 + self.centery
-            self.i += self.stepi
-        if self.i > self.endi - self.stepi:
-            self.done = True
-        return self.x, self.y
-
-class Line(Chainable):
-    def __init__(self, startx, starty, endx, endy, nsteps=100):
-        super().__init__()
-        self.nsteps = nsteps
-        self.done = False
-        self.i = 0
-
-        self.dx = (endx - startx) / nsteps
-        self.dy = (endy - starty) / nsteps
-
-        self.x = startx - self.dx
-        self.y = starty - self.dy
-
-    def update(self, i = None):
-        if not self.done:
-            self.x += self.dx
-            self.y += self.dy
-            self.i += 1
-        if self.i > self.nsteps:
-            self.done = True
-        return self.x, self.y
-        
-class Parabola(Chainable):
-    def __init__(self, root1, root2, y, height, startx, dx, endi, stepi=1.0):
-        super().__init__()
-        if dx not in [1, -1]:
-            raise ValueError("parameter dx of Parabola object must be eiterh +1 or -1")
-        self.done = False
-        self.i = 0
-        self.root1 = root1
-        self.root2 = root2
-        self.y1 = y
-        self.height = height
-        self.endi = endi
-        self.stepi = stepi
-
-        self.dx = dx * stepi
-        self.x = startx - self.dx
-        self.centerx = (root2 - root1) / 2
-
-    def update(self, i = None):
-        if not self.done: 
-            self.x += self.dx
-            self.y = - (self.height / (self.centerx ** 2)) * (self.x - self.root1) * (self.x - self.root2) + self.y1
-            self.i += self.stepi
-        if self.i > self.endi:
-            self.done = True
-        return self.x, self.y
     
 class Letter:
     def __init__(self, config):
@@ -159,6 +83,43 @@ class Letter:
         
         return first.then(second).then(stick)
     
+    def e(self, cornerx, cornery, radiusx=None, radiusy=None, nsteps=None):
+        radiusx = radiusx or self.radiusx * 0.9
+        radiusy = radiusy or self.radiusy
+        centerx = cornerx + radiusx
+        centery = cornery + radiusy
+        endi = 2 * radiusx
+        nsteps = nsteps or 2 * radiusx
+        stepi = endi / nsteps
+        proportion = 0.9
+
+        line = Line(centerx - radiusx * proportion * 0.95, centery, centerx + radiusx * proportion * 0.95, centery, nsteps)
+
+        first = SemiEllipse(centerx, centery, radiusx * proportion, radiusy, -1, True, stepi/2, stepi, endi * proportion + stepi)
+        second = SemiEllipse(centerx, centery, radiusx, radiusy, 1, False, 0, stepi, endi * proportion)
+        
+        return line.then(first).then(second)
+
+    def f(self, cornerx, cornery, radiusx=None, radiusy=None, height=None, width=None, nstepsHeight=None, nstepsCurve=None, nstepsDash=None):
+        radiusx = radiusx or self.master_dimension / 2
+        radiusy = radiusy or self.master_dimension / 2
+        height = height or self.master_dimension * 3 / 2
+        width = width or self.master_dimension * 0.6
+        nstepsHeight = nstepsHeight or height / 2
+        nstepsDash = nstepsDash or width / 2
+        nstepsCurve = nstepsCurve or 2 * self.radiusx
+        centerx = cornerx + radiusx
+        centery = cornery + radiusy
+        endi = radiusx
+        stepi = endi / nstepsCurve
+
+        lying_stick = Line(centerx + width * 0.2, cornery, centerx, cornery, nstepsDash)
+        curve = SemiEllipse(centerx, centery, radiusx, radiusy, -1, True, endi, stepi, 2 * endi)
+        stick = Line(cornerx, cornery + radiusy, cornerx, cornery + radiusy + height, nstepsHeight)
+        dash = Line(cornerx + radiusx - width, cornery + radiusy * 1.5, cornerx + radiusx + width * 0.2, cornery + radiusy * 1.5, nstepsDash)
+
+        return stick.then(curve).then(lying_stick).then(dash)
+        
     def h(self, cornerx, cornery, radiusx=None, radiusy=None, height=None, nstepsHeight=None, nstepsCircle=None):
         radiusx = radiusx or self.radiusx
         radiusy = radiusy or self.radiusy * 2
